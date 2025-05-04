@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: blog-core
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blog
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+server:
+  port: 2999
+
+jwt:
+  secret_key: 7f308a91217bbf00a065bdc0105db540e5beb3f9971j67011f327bb3100d655782765d07e9cc3440e7323fec823806f5aad5d1c205bce93576a361eef1f4a86011865691e0e23f7addeba19294dc149e8416e4da3aa2535e4348216280f7747ed85af93541661959a3f0251ee4b4fa1aeec973a00c4b0567518db6bdcada9726414cb507a48ec87140996ceb7395bafe166eb88ec67403c3642c45731c660844dbcf444c8cf5da749f413d5396f9102678af107
+  expiration_time: 900000 #unit miliseconds
+  rf_secret_key: kyAy3kp8iDApg/kG2qZYLtOKx0H/afSEP0LJYgmLtUyICOmp8ZxPlBOBcQr/2NuKwGoYl8BnYBXzPRMEXm4itJjPMEfeCNJbifwEvgEm+o9e2XCzaSgFMCfedWcqvmZjJ5SQoy0XfDaCV40gu85F39f5er4/mRRE7un+1k3u7MCjKsB9wspUSIx04NXzrZktaaPAl15KWaKlIZFrhBsAbE=
+  rf_expiration_time:  86400000
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: admin
+  secretKey: 123456789
+  bucket: blog1
+  presignedUrlExpirationTime: 500000 #unit miliseconds
+
+app:
+  firebase-configuration-file: firebase-admin-sdk.json
+  default-password: N+B)$zn%DF3+1EZ83763f6ed14d3508de435hgvhg4v53hgksxxmksndj
+  default-avatar: https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1
+  max-report: 5
+  report-duration: 86400 #unit seconds
+  admin-username : admin
+  cache:
+    ttl: 358000 #unit miliseconds
+  pwd-cache:
+    ttl: 900000 #unit miliseconds
+
+google:
+  oauth2:
+    clientId:
+    clientSecret:
+    projectId:
+    authUri:
+    tokenUri:
+    authProviderCertUrl:
+    redirectUris: http://localhost:3000
+    userInfoUri: https://www.googleapis.com/oauth2/v2/userinfo
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger

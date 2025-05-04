@@ -1,0 +1,48 @@
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    avatar VARCHAR(255),
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    quotes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users
+    (avatar, username, password, email, first_name, last_name, quotes)
+VALUES
+    ('https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1', 'sup_admin', 'admin', 'sup_admin@localhost.com', 'Son', 'Ngo', 'I am an admin user.') ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_SUB_ADMIN') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_MEMBER') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_WRITER') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_COMMENTATOR') ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS user_roles (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    role_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
+);
+
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 1) ON CONFLICT DO NOTHING;
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 2) ON CONFLICT DO NOTHING;
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 3) ON CONFLICT DO NOTHING;
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 4) ON CONFLICT DO NOTHING;
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 5) ON CONFLICT DO NOTHING;
+
+

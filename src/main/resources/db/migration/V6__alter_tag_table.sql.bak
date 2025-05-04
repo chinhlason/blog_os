@@ -1,0 +1,1 @@
+ALTER TABLE tags ADD posts_number INT DEFAULT 0;

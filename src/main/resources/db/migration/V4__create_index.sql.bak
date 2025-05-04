@@ -1,0 +1,75 @@
+CREATE TEXT SEARCH DICTIONARY public.vietnamese (
+   TEMPLATE = pg_catalog.simple,
+   STOPWORDS = vietnamese
+);
+
+CREATE TEXT SEARCH CONFIGURATION public.vietnamese (
+   COPY = pg_catalog.english
+);
+
+ALTER TEXT SEARCH CONFIGURATION public.vietnamese
+   ALTER MAPPING
+      FOR asciiword, asciihword, hword_asciipart, hword, hword_part, word
+      WITH vietnamese;
+
+CREATE INDEX posts_searching ON posts USING gin
+    (to_tsvector('public.vietnamese', COALESCE(title, '') || ' ' || COALESCE(content, '')));
+
+CREATE OR REPLACE FUNCTION search_posts_v5(
+    search_query TEXT,
+    search_limit INT DEFAULT 10,
+    search_offset INT DEFAULT 0
+)
+    RETURNS TABLE (
+                      rank REAL,
+                      id INT,
+                      title TEXT,
+                      content TEXT,
+                      views INT,
+                      "commentCount" INT,
+                      "createdAt" TIMESTAMP,
+                      "updatedAt" TIMESTAMP,
+                      author JSONB,
+                      tags JSONB
+                  ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT
+            ts_rank_cd(
+                    to_tsvector('public.vietnamese', COALESCE(posts.title, '') || ' ' || COALESCE(posts.content, '')),
+                    to_tsquery(replace(websearch_to_tsquery(search_query)::TEXT, '&', '|'))
+            ) AS rank,
+            posts.id AS "id",
+            posts.title AS "title",
+            posts.content AS "content",
+            posts.views AS "views",
+            posts.comment_count AS "commentCount",
+            posts.created_at AS "createdAt",
+            posts.updated_at AS "updatedAt",
+            jsonb_build_object(
+                    'id', author.id,
+                    'username', author.username,
+                    'firstName', author.first_name,
+                    'lastName', author.last_name,
+                    'avatar', author.avatar
+            )::jsonb AS "author",
+            COALESCE(
+                            jsonb_agg(jsonb_build_object('id', tags.id, 'name', tags.name)) FILTER (WHERE tags.id IS NOT NULL),
+                            '[]'::jsonb
+            ) AS "tags"
+        FROM posts
+                 JOIN users author ON author.id = posts.id_author
+                 LEFT JOIN post_tags pt ON pt.id_post = posts.id
+                 LEFT JOIN tags ON tags.id = pt.id_tag
+        WHERE to_tsvector('public.vietnamese', COALESCE(posts.title, '') || ' ' || COALESCE(posts.content, ''))
+                  @@ to_tsquery(replace(websearch_to_tsquery(search_query)::TEXT, '&', '|'))
+        GROUP BY posts.id, author.id, author.username, author.first_name, author.last_name, author.avatar
+        ORDER BY rank DESC
+        LIMIT search_limit OFFSET search_offset;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- SELECT * FROM search_posts('Golang là hai ngôn ngữ backend Java', 10, 0);
+

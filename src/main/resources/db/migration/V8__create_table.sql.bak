@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS followers (
+    id SERIAL PRIMARY KEY,
+    id_user INT NOT NULL,
+    id_following INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_user) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (id_following) REFERENCES users (id) ON DELETE CASCADE
+);
